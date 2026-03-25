@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Serverless Framework
+.serverless/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# AWS credentials (never commit these)
+.aws/
+
+# Build output
+dist/
+build/
+frontend/dist/
+frontend/build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+.nyc_output/

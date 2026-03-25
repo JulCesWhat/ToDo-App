@@ -1,0 +1,27 @@
+@baseUrl = http://localhost:3000/todos
+
+### Create a todo
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "text": "Buy milk"
+}
+
+### List all todos
+GET {{baseUrl}}
+
+### Get a single todo (replace <id> after creating one)
+GET {{baseUrl}}/<id>
+
+### Update a todo (replace <id>)
+PUT {{baseUrl}}/<id>
+Content-Type: application/json
+
+{
+  "text": "Buy oat milk",
+  "checked": true
+}
+
+### Delete a todo (replace <id>)
+DELETE {{baseUrl}}/<id>

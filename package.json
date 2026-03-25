@@ -1,0 +1,23 @@
+{
+  "name": "todo-api",
+  "version": "1.0.0",
+  "description": "Serverless REST API backed by AWS Lambda and DynamoDB",
+  "main": "index.js",
+  "scripts": {
+    "dev": "IS_OFFLINE=true serverless offline start",
+    "deploy": "serverless deploy",
+    "deploy:prod": "serverless deploy --stage prod",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "serverless": "^4.0.0",
+    "serverless-dynamodb-local": "^0.2.40",
+    "serverless-offline": "^14.0.0"
+  }
+}
