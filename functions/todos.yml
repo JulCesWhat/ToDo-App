@@ -1,0 +1,54 @@
+createTodo:
+  handler: src/todos/create.handler
+  events:
+    - http:
+        method: POST
+        path: todos
+        cors: true
+        authorizer:
+          type: COGNITO_USER_POOLS
+          authorizerId: !Ref ApiGatewayAuthorizer
+
+listTodos:
+  handler: src/todos/list.handler
+  events:
+    - http:
+        method: GET
+        path: todos
+        cors: true
+        authorizer:
+          type: COGNITO_USER_POOLS
+          authorizerId: !Ref ApiGatewayAuthorizer
+
+getTodo:
+  handler: src/todos/get.handler
+  events:
+    - http:
+        method: GET
+        path: todos/{id}
+        cors: true
+        authorizer:
+          type: COGNITO_USER_POOLS
+          authorizerId: !Ref ApiGatewayAuthorizer
+
+updateTodo:
+  handler: src/todos/update.handler
+  events:
+    - http:
+        method: PUT
+        path: todos/{id}
+        cors: true
+        authorizer:
+          type: COGNITO_USER_POOLS
+          authorizerId: !Ref ApiGatewayAuthorizer
+
+deleteTodo:
+  handler: src/todos/delete.handler
+  events:
+    - http:
+        method: DELETE
+        path: todos/{id}
+        cors: true
+        authorizer:
+          type: COGNITO_USER_POOLS
+          authorizerId: !Ref ApiGatewayAuthorizer

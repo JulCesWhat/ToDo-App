@@ -32,115 +32,12 @@ provider:
           Resource:
             - !GetAtt TodosTable.Arn
 
-functions:
-  createTodo:
-    handler: src/todos/create.handler
-    events:
-      - http:
-          method: POST
-          path: todos
-          cors: true
-          authorizer:
-            type: COGNITO_USER_POOLS
-            authorizerId: !Ref ApiGatewayAuthorizer
-
-  listTodos:
-    handler: src/todos/list.handler
-    events:
-      - http:
-          method: GET
-          path: todos
-          cors: true
-          authorizer:
-            type: COGNITO_USER_POOLS
-            authorizerId: !Ref ApiGatewayAuthorizer
-
-  getTodo:
-    handler: src/todos/get.handler
-    events:
-      - http:
-          method: GET
-          path: todos/{id}
-          cors: true
-          authorizer:
-            type: COGNITO_USER_POOLS
-            authorizerId: !Ref ApiGatewayAuthorizer
-
-  updateTodo:
-    handler: src/todos/update.handler
-    events:
-      - http:
-          method: PUT
-          path: todos/{id}
-          cors: true
-          authorizer:
-            type: COGNITO_USER_POOLS
-            authorizerId: !Ref ApiGatewayAuthorizer
-
-  deleteTodo:
-    handler: src/todos/delete.handler
-    events:
-      - http:
-          method: DELETE
-          path: todos/{id}
-          cors: true
-          authorizer:
-            type: COGNITO_USER_POOLS
-            authorizerId: !Ref ApiGatewayAuthorizer
+functions: ${file(functions/todos.yml)}
 
 resources:
   Resources:
-    CognitoUserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: ${self:service}-${sls:stage}-user-pool
-        AutoVerifiedAttributes:
-          - email
-        UsernameAttributes:
-          - email
-        Policies:
-          PasswordPolicy:
-            MinimumLength: 8
-            RequireUppercase: true
-            RequireLowercase: true
-            RequireNumbers: true
-            RequireSymbols: false
-
-    CognitoUserPoolClient:
-      Type: AWS::Cognito::UserPoolClient
-      Properties:
-        ClientName: ${self:service}-${sls:stage}-client
-        UserPoolId: !Ref CognitoUserPool
-        ExplicitAuthFlows:
-          - ALLOW_USER_SRP_AUTH
-          - ALLOW_REFRESH_TOKEN_AUTH
-        GenerateSecret: false
-
-    ApiGatewayAuthorizer:
-      Type: AWS::ApiGateway::Authorizer
-      Properties:
-        Name: CognitoAuthorizer
-        Type: COGNITO_USER_POOLS
-        IdentitySource: method.request.header.Authorization
-        RestApiId: !Ref ApiGatewayRestApi
-        ProviderARNs:
-          - !GetAtt CognitoUserPool.Arn
-
-    TodosTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.environment.TODOS_TABLE}
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: userId
-            AttributeType: S
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: userId
-            KeyType: HASH
-          - AttributeName: id
-            KeyType: RANGE
+    ${file(resources/cognito.yml)}
+    ${file(resources/dynamodb.yml)}
 
   Outputs:
     UserPoolId:

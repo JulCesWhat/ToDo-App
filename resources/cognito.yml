@@ -1,0 +1,35 @@
+CognitoUserPool:
+  Type: AWS::Cognito::UserPool
+  Properties:
+    UserPoolName: ${self:service}-${sls:stage}-user-pool
+    AutoVerifiedAttributes:
+      - email
+    UsernameAttributes:
+      - email
+    Policies:
+      PasswordPolicy:
+        MinimumLength: 8
+        RequireUppercase: true
+        RequireLowercase: true
+        RequireNumbers: true
+        RequireSymbols: false
+
+CognitoUserPoolClient:
+  Type: AWS::Cognito::UserPoolClient
+  Properties:
+    ClientName: ${self:service}-${sls:stage}-client
+    UserPoolId: !Ref CognitoUserPool
+    ExplicitAuthFlows:
+      - ALLOW_USER_SRP_AUTH
+      - ALLOW_REFRESH_TOKEN_AUTH
+    GenerateSecret: false
+
+ApiGatewayAuthorizer:
+  Type: AWS::ApiGateway::Authorizer
+  Properties:
+    Name: CognitoAuthorizer
+    Type: COGNITO_USER_POOLS
+    IdentitySource: method.request.header.Authorization
+    RestApiId: !Ref ApiGatewayRestApi
+    ProviderARNs:
+      - !GetAtt CognitoUserPool.Arn
