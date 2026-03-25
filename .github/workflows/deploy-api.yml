@@ -10,15 +10,6 @@ on:
       - 'package.json'
       - 'package-lock.json'
   workflow_dispatch:
-    inputs:
-      stage:
-        description: 'Stage to deploy to'
-        required: true
-        default: 'prod'
-        type: choice
-        options:
-          - prod
-          - dev
 
 jobs:
   deploy-dev:
@@ -47,11 +38,11 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
 
-  deploy-manual:
-    name: Deploy API to ${{ github.event.inputs.stage }}
+  deploy-prod:
+    name: Deploy API to prod
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    environment: ${{ github.event.inputs.stage == 'prod' && 'Production' || 'Development' }}
+    environment: Development
 
     steps:
       - name: Checkout code
@@ -66,8 +57,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Deploy
-        run: npx serverless deploy --stage ${{ github.event.inputs.stage }}
+      - name: Deploy to prod
+        run: npx serverless deploy --stage prod
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

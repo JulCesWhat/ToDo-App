@@ -34,13 +34,17 @@ jobs:
         run: npm ci
         working-directory: frontend
 
+      - name: Run tests
+        run: npm test
+        working-directory: frontend
+
       - name: Build
         run: npm run build
         working-directory: frontend
         env:
-          VITE_API_URL: ${{ secrets.API_URL_DEV }}
-          VITE_USER_POOL_ID: ${{ secrets.USER_POOL_ID }}
-          VITE_USER_POOL_CLIENT_ID: ${{ secrets.USER_POOL_CLIENT_ID }}
+          VITE_API_URL: ${{ vars.API_URL_DEV }}
+          VITE_USER_POOL_ID: ${{ vars.USER_POOL_ID }}
+          VITE_USER_POOL_CLIENT_ID: ${{ vars.USER_POOL_CLIENT_ID }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
