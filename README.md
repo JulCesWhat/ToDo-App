@@ -7,7 +7,7 @@ A full-stack serverless todo application built with AWS Lambda, API Gateway, Dyn
 | Environment | URL |
 |---|---|
 | Frontend | https://julceswhat.github.io/ToDo-App/ |
-| API | https://gj5t27g3ba.execute-api.us-east-1.amazonaws.com/dev/todos |
+| API | https://m9rq0ko1rh.execute-api.us-east-1.amazonaws.com/dev/todos |
 
 ---
 
