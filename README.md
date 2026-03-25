@@ -32,21 +32,34 @@ Authentication is handled by **AWS Cognito** — users sign up/log in via the Re
 ```
 ToDo-App/
 ├── .github/workflows/
-│   ├── deploy-api.yml        # Deploys backend to AWS on push to main
-│   └── deploy-frontend.yml   # Deploys frontend to GitHub Pages on push to main
+│   ├── deploy-api.yml          # Deploys backend to AWS (dev on push, prod on manual)
+│   └── deploy-frontend.yml     # Deploys frontend to GitHub Pages on push to main
 ├── src/todos/
-│   ├── create.js             # POST /todos
-│   ├── list.js               # GET /todos
-│   ├── get.js                # GET /todos/{id}
-│   ├── update.js             # PUT /todos/{id}
-│   └── delete.js             # DELETE /todos/{id}
+│   ├── create.mjs              # POST /todos
+│   ├── list.mjs                # GET /todos
+│   ├── get.mjs                 # GET /todos/{id}
+│   ├── update.mjs              # PUT /todos/{id}
+│   ├── delete.mjs              # DELETE /todos/{id}
+│   └── __tests__/              # Unit tests (Vitest)
+│       ├── create.test.mjs
+│       ├── list.test.mjs
+│       ├── get.test.mjs
+│       ├── update.test.mjs
+│       └── delete.test.mjs
+├── functions/
+│   └── todos.yml               # Lambda function definitions
+├── resources/
+│   ├── cognito.yml             # Cognito User Pool & Authorizer
+│   └── dynamodb.yml            # DynamoDB table definition
 ├── frontend/
 │   └── src/
-│       ├── App.jsx            # Main UI with auth + todo management
-│       ├── api.js             # API calls with Authorization header
-│       └── auth.js            # Cognito sign in/up/out helpers
-├── serverless.yml             # AWS infrastructure definition
-└── package.json               # Backend dependencies
+│       ├── App.jsx             # Main UI with auth + todo management
+│       ├── api.js              # API calls with Authorization header
+│       ├── auth.js             # Cognito sign in/up/out helpers
+│       └── test/               # Frontend UI tests (Vitest + RTL)
+├── serverless.yml              # Main AWS infrastructure config
+├── vitest.config.js            # Backend test config
+└── package.json                # Backend dependencies
 ```
 
 ---
@@ -110,8 +123,10 @@ Two pipelines run automatically on push to `main`:
 
 | Pipeline | Trigger | What it does |
 |---|---|---|
-| `deploy-api.yml` | Changes to `src/**`, `serverless.yml`, `package.json` | Deploys backend to AWS |
-| `deploy-frontend.yml` | Changes to `frontend/**` | Builds React app and deploys to GitHub Pages |
+| `deploy-api.yml` | Changes to `src/**`, `serverless.yml`, `package.json` | Runs backend tests, then deploys to AWS |
+| `deploy-frontend.yml` | Changes to `frontend/**` | Runs frontend tests, builds React app, deploys to GitHub Pages |
+
+Both pipelines run unit tests before deploying — a failing test will block the deploy.
 
 A **manual deploy to prod** button is available in the API pipeline via `workflow_dispatch`.
 
@@ -136,8 +151,27 @@ All endpoints require a Cognito JWT passed as `Authorization: <token>` header.
 | Frontend | React 18, Vite, Tailwind CSS v4 |
 | Auth | AWS Cognito (User Pools) |
 | API | AWS API Gateway (REST) |
-| Compute | AWS Lambda (Node.js 20) |
-| Database | AWS DynamoDB (on-demand) |
+| Compute | AWS Lambda (Node.js 20, ESM) |
+| Database | AWS DynamoDB (on-demand, user-scoped) |
+| Bundling | esbuild (via serverless-esbuild) |
 | IaC | Serverless Framework v4 |
+| Testing | Vitest, React Testing Library |
 | CI/CD | GitHub Actions |
 | Hosting | GitHub Pages |
+
+---
+
+## Testing
+
+### Backend (27 tests)
+
+```bash
+npm test          # single run
+npm run test:watch # watch mode
+```
+
+### Frontend (17 tests)
+
+```bash
+cd frontend && npm test
+```
