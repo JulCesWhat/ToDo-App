@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -11,9 +11,13 @@ const client = new DynamoDBClient(
 );
 const docClient = DynamoDBDocumentClient.from(client);
 
-module.exports.handler = async () => {
-  const result = await docClient.send(new ScanCommand({
+module.exports.handler = async (event) => {
+  const userId = event.requestContext.authorizer.claims.sub;
+
+  const result = await docClient.send(new QueryCommand({
     TableName: process.env.TODOS_TABLE,
+    KeyConditionExpression: 'userId = :uid',
+    ExpressionAttributeValues: { ':uid': userId },
   }));
 
   return { statusCode: 200, headers, body: JSON.stringify(result.Items) };

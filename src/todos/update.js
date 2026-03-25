@@ -12,6 +12,7 @@ const client = new DynamoDBClient(
 const docClient = DynamoDBDocumentClient.from(client);
 
 module.exports.handler = async (event) => {
+  const userId = event.requestContext.authorizer.claims.sub;
   const { id } = event.pathParameters;
   let data;
 
@@ -32,7 +33,7 @@ module.exports.handler = async (event) => {
   try {
     const result = await docClient.send(new UpdateCommand({
       TableName: process.env.TODOS_TABLE,
-      Key: { id },
+      Key: { userId, id },
       // 'text' is a DynamoDB reserved word — use an expression attribute name
       UpdateExpression: 'SET #txt = :text, checked = :checked, updatedAt = :updatedAt',
       ExpressionAttributeNames: { '#txt': 'text' },
@@ -41,7 +42,7 @@ module.exports.handler = async (event) => {
         ':checked': data.checked ?? false,
         ':updatedAt': new Date().toISOString(),
       },
-      ConditionExpression: 'attribute_exists(id)',
+      ConditionExpression: 'attribute_exists(userId)',
       ReturnValues: 'ALL_NEW',
     }));
 

@@ -12,11 +12,12 @@ const client = new DynamoDBClient(
 const docClient = DynamoDBDocumentClient.from(client);
 
 module.exports.handler = async (event) => {
+  const userId = event.requestContext.authorizer.claims.sub;
   const { id } = event.pathParameters;
 
   const result = await docClient.send(new GetCommand({
     TableName: process.env.TODOS_TABLE,
-    Key: { id },
+    Key: { userId, id },
   }));
 
   if (!result.Item) {

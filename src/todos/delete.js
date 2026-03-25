@@ -12,13 +12,14 @@ const client = new DynamoDBClient(
 const docClient = DynamoDBDocumentClient.from(client);
 
 module.exports.handler = async (event) => {
+  const userId = event.requestContext.authorizer.claims.sub;
   const { id } = event.pathParameters;
 
   try {
     await docClient.send(new DeleteCommand({
       TableName: process.env.TODOS_TABLE,
-      Key: { id },
-      ConditionExpression: 'attribute_exists(id)',
+      Key: { userId, id },
+      ConditionExpression: 'attribute_exists(userId)',
     }));
   } catch (err) {
     if (err.name === 'ConditionalCheckFailedException') {

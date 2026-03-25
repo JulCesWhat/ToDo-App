@@ -13,6 +13,8 @@ const client = new DynamoDBClient(
 const docClient = DynamoDBDocumentClient.from(client);
 
 module.exports.handler = async (event) => {
+  const userId = event.requestContext.authorizer.claims.sub;
+
   let data;
   try {
     data = JSON.parse(event.body);
@@ -25,6 +27,7 @@ module.exports.handler = async (event) => {
   }
 
   const item = {
+    userId,
     id: uuidv4(),
     text: data.text.trim(),
     checked: false,
