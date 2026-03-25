@@ -2,18 +2,17 @@ service: todo-api
 
 frameworkVersion: '4'
 
-plugins:
-  - serverless-esbuild
-  - serverless-offline
-
-custom:
+build:
   esbuild:
     bundle: true
     minify: true
-    platform: node
-    target: node20
-    exclude:
+    external:
       - '@aws-sdk/*'
+
+plugins:
+  - serverless-offline
+
+custom:
   serverless-offline:
     httpPort: 3000
     noPrependStageInUrl: true
