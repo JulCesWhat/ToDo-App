@@ -1,11 +1,14 @@
+# Cognito User Pool — handles user sign-up, sign-in, and JWT issuance
+# Users authenticate with email/password via SRP (Secure Remote Password)
 CognitoUserPool:
   Type: AWS::Cognito::UserPool
+  DeletionPolicy: Retain
   Properties:
     UserPoolName: ${self:service}-${sls:stage}-user-pool
     AutoVerifiedAttributes:
       - email
     UsernameAttributes:
-      - email
+      - email                    # users sign in with email address
     Policies:
       PasswordPolicy:
         MinimumLength: 8
@@ -14,16 +17,21 @@ CognitoUserPool:
         RequireNumbers: true
         RequireSymbols: false
 
+# App client — used by the React frontend to authenticate against the User Pool
+# No client secret (GenerateSecret: false) since this is a public SPA
 CognitoUserPoolClient:
   Type: AWS::Cognito::UserPoolClient
   Properties:
     ClientName: ${self:service}-${sls:stage}-client
     UserPoolId: !Ref CognitoUserPool
     ExplicitAuthFlows:
-      - ALLOW_USER_SRP_AUTH
-      - ALLOW_REFRESH_TOKEN_AUTH
-    GenerateSecret: false
+      - ALLOW_USER_SRP_AUTH          # secure password auth (no plaintext)
+      - ALLOW_REFRESH_TOKEN_AUTH     # enables token refresh without re-login
+    GenerateSecret: false            # required for browser-based (public) clients
 
+# API Gateway Authorizer — validates Cognito JWTs on every request
+# Extracts the token from the Authorization header and verifies it
+# against the User Pool before the Lambda function is invoked
 ApiGatewayAuthorizer:
   Type: AWS::ApiGateway::Authorizer
   Properties:

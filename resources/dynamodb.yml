@@ -1,8 +1,13 @@
+# DynamoDB table for storing user todos
+# Uses a composite key to scope data per user:
+#   - userId (HASH): from Cognito JWT claims.sub
+#   - id (RANGE): unique todo ID (UUID)
 TodosTable:
   Type: AWS::DynamoDB::Table
+  DeletionPolicy: Retain
   Properties:
     TableName: ${self:provider.environment.TODOS_TABLE}
-    BillingMode: PAY_PER_REQUEST
+    BillingMode: PAY_PER_REQUEST  # scales automatically, no capacity planning
     AttributeDefinitions:
       - AttributeName: userId
         AttributeType: S
@@ -10,6 +15,6 @@ TodosTable:
         AttributeType: S
     KeySchema:
       - AttributeName: userId
-        KeyType: HASH
+        KeyType: HASH   # partition key — enables Query by user
       - AttributeName: id
-        KeyType: RANGE
+        KeyType: RANGE  # sort key — unique todo within a user

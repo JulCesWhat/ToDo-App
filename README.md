@@ -119,6 +119,8 @@ cd frontend && npm run dev
 
 ## CI/CD (GitHub Actions)
 
+![Pipeline](pipeline.png)
+
 Two pipelines run automatically on push to `main`:
 
 | Pipeline | Trigger | What it does |
