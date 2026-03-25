@@ -1,6 +1,11 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 
+const headers = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Credentials': true,
+};
+
 const client = new DynamoDBClient(
   process.env.IS_OFFLINE ? { endpoint: 'http://localhost:8000', region: 'localhost', credentials: { accessKeyId: 'local', secretAccessKey: 'local' } } : {}
 );
@@ -13,24 +18,15 @@ module.exports.handler = async (event) => {
   try {
     data = JSON.parse(event.body);
   } catch {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Invalid JSON body' }),
-    };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON body' }) };
   }
 
   if (data.text !== undefined && typeof data.text !== 'string') {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: '"text" must be a string' }),
-    };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: '"text" must be a string' }) };
   }
 
   if (data.checked !== undefined && typeof data.checked !== 'boolean') {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: '"checked" must be a boolean' }),
-    };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: '"checked" must be a boolean' }) };
   }
 
   try {
@@ -39,9 +35,7 @@ module.exports.handler = async (event) => {
       Key: { id },
       // 'text' is a DynamoDB reserved word — use an expression attribute name
       UpdateExpression: 'SET #txt = :text, checked = :checked, updatedAt = :updatedAt',
-      ExpressionAttributeNames: {
-        '#txt': 'text',
-      },
+      ExpressionAttributeNames: { '#txt': 'text' },
       ExpressionAttributeValues: {
         ':text': data.text,
         ':checked': data.checked ?? false,
@@ -51,16 +45,10 @@ module.exports.handler = async (event) => {
       ReturnValues: 'ALL_NEW',
     }));
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(result.Attributes),
-    };
+    return { statusCode: 200, headers, body: JSON.stringify(result.Attributes) };
   } catch (err) {
     if (err.name === 'ConditionalCheckFailedException') {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ error: 'Todo not found' }),
-      };
+      return { statusCode: 404, headers, body: JSON.stringify({ error: 'Todo not found' }) };
     }
     throw err;
   }
