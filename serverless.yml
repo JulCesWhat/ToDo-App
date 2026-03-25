@@ -43,12 +43,12 @@ provider:
 functions: ${file(functions/todos.yml)}
 
 resources:
-  Resources:
-    ${file(resources/cognito.yml)}
-    ${file(resources/dynamodb.yml)}
-
-  Outputs:
-    UserPoolId:
-      Value: !Ref CognitoUserPool
-    UserPoolClientId:
-      Value: !Ref CognitoUserPoolClient
+  - Resources:
+      ${file(resources/cognito.yml)}
+  - Resources:
+      ${file(resources/dynamodb.yml)}
+  - Outputs:
+      UserPoolId:
+        Value: !Ref CognitoUserPool
+      UserPoolClientId:
+        Value: !Ref CognitoUserPoolClient

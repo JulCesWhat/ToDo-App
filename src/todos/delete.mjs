@@ -1,5 +1,5 @@
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, DeleteCommand } from '@aws-sdk/lib-dynamodb';
 
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -11,7 +11,7 @@ const client = new DynamoDBClient(
 );
 const docClient = DynamoDBDocumentClient.from(client);
 
-module.exports.handler = async (event) => {
+export const handler = async (event) => {
   const userId = event.requestContext.authorizer.claims.sub;
   const { id } = event.pathParameters;
 

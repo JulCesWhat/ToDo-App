@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "IS_OFFLINE=true serverless offline start",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "deploy": "serverless deploy",
     "deploy:prod": "serverless deploy --stage prod",
     "remove": "serverless remove",
@@ -18,6 +20,7 @@
   "devDependencies": {
     "serverless": "^4.0.0",
     "serverless-dynamodb-local": "^0.2.40",
-    "serverless-offline": "^14.0.0"
+    "serverless-offline": "^14.0.0",
+    "vitest": "^4.1.1"
   }
 }
